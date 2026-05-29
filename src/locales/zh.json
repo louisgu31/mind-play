@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "思维游戏"
+  },
+  "nav": {
+    "home": "首页",
+    "games": "游戏",
+    "stats": "统计",
+    "settings": "设置"
+  },
+  "home": {
+    "dailyStreak": "每日连胜",
+    "continuePlaying": "继续游戏",
+    "exploreGames": "探索游戏"
+  },
+  "settings": {
+    "language": "语言",
+    "theme": "主题",
+    "sound": "声音",
+    "darkMode": "深色模式",
+    "lightMode": "浅色模式"
+  },
+  "games": {
+    "wordle": {
+      "title": "猜词游戏",
+      "description": "6次机会猜出单词"
+    },
+    "crossword": {
+      "title": "填字游戏",
+      "description": "解决每日谜题"
+    },
+    "connections": {
+      "title": "连线游戏",
+      "description": "将单词分组"
+    },
+    "chess": {
+      "title": "国际象棋",
+      "description": "与AI对战"
+    },
+    "sudoku": {
+      "title": "数独",
+      "description": "填满网格"
+    },
+    "memory": {
+      "title": "记忆游戏",
+      "description": "匹配卡片"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "MindPlay"
+  },
+  "nav": {
+    "home": "Home",
+    "games": "Games",
+    "stats": "Stats",
+    "settings": "Settings"
+  },
+  "home": {
+    "dailyStreak": "Daily Streak",
+    "continuePlaying": "Continue Playing",
+    "exploreGames": "Explore Games"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "sound": "Sound",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "games": {
+    "wordle": {
+      "title": "Wordle",
+      "description": "Guess the word in 6 tries"
+    },
+    "crossword": {
+      "title": "Crossword",
+      "description": "Solve the daily puzzle"
+    },
+    "connections": {
+      "title": "Connections",
+      "description": "Group the words"
+    },
+    "chess": {
+      "title": "Chess",
+      "description": "Play against AI"
+    },
+    "sudoku": {
+      "title": "Sudoku",
+      "description": "Fill the grid"
+    },
+    "memory": {
+      "title": "Memory",
+      "description": "Match the cards"
+    }
+  }
+}
