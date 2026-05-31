@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Home, Gamepad2, Trophy, Settings, Download as DownloadIcon } from 'lucide-react';
@@ -13,7 +13,6 @@ import GamesScreen from './screens/GamesScreen';
 import StatsScreen from './screens/StatsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import DownloadScreen from './screens/DownloadScreen';
-import NotFoundScreen from './screens/NotFoundScreen';
 import WordleScreen from './games/WordleScreen';
 import ConnectionsScreen from './games/ConnectionsScreen';
 import MemoryScreen from './games/MemoryScreen';
@@ -104,7 +103,7 @@ export default function App() {
             <Route path="/games/sudoku" element={<SudokuScreen />} />
             <Route path="/games/crossword" element={<CrosswordScreen />} />
             <Route path="/games/chess" element={<ChessScreen />} />
-            <Route path="*" element={<NotFoundScreen />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Navigation />
         </div>

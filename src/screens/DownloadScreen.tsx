@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Download, Monitor, Globe, CheckCircle2 } from 'lucide-react';
+import { Download, Monitor, Globe, CheckCircle2, Terminal } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAppStore } from '../store';
@@ -18,26 +18,8 @@ export default function DownloadScreen() {
       description: 'For Mac with M1/M2/M3 chips',
       color: 'from-blue-500 to-indigo-600',
       size: '~120 MB',
-      link: '#', // Replace with your actual link!
+      link: 'https://github.com/louisgu31/mind-play/releases/download/v1.0.1/MindPlay-1.0.0-arm64.dmg',
       recommended: true
-    },
-    {
-      platform: 'Windows',
-      icon: Monitor,
-      description: 'For Windows 10/11',
-      color: 'from-purple-500 to-pink-600',
-      size: '~150 MB',
-      link: '#',
-      disabled: true // You haven't built Windows yet
-    },
-    {
-      platform: 'Linux',
-      icon: Monitor,
-      description: 'For Ubuntu, Fedora, etc.',
-      color: 'from-green-500 to-emerald-600',
-      size: '~130 MB',
-      link: '#',
-      disabled: true // You haven't built Linux yet
     },
     {
       platform: 'Web (Beta)',
@@ -45,7 +27,7 @@ export default function DownloadScreen() {
       description: 'Play directly in your browser',
       color: 'from-orange-500 to-red-600',
       size: 'Instant',
-      link: '/'
+      link: 'https://louisgu31.github.io/mind-play/'
     }
   ];
 
@@ -138,18 +120,17 @@ export default function DownloadScreen() {
         </motion.div>
 
         {/* Downloads Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
           {downloads.map((download, index) => (
             <motion.div
               key={download.platform}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + index * 0.1 }}
-              whileHover={download.disabled ? {} : { y: -5, scale: 1.02 }}
+              whileHover={{ y: -5, scale: 1.02 }}
               className={cn(
                 "relative p-6 rounded-3xl shadow-xl overflow-hidden transition-all duration-300",
-                theme === 'light' ? "bg-white" : "bg-gray-800 border border-gray-700",
-                download.disabled && "opacity-50 cursor-not-allowed"
+                theme === 'light' ? "bg-white" : "bg-gray-800 border border-gray-700"
               )}
             >
               {download.recommended && (
@@ -170,7 +151,6 @@ export default function DownloadScreen() {
                 theme === 'light' ? "text-gray-900" : "text-white"
               )}>
                 {download.platform}
-                {download.disabled && <span className="text-sm ml-2">(Coming Soon)</span>}
               </h3>
               
               <p className={cn(
@@ -190,13 +170,12 @@ export default function DownloadScreen() {
                 
                 <a
                   href={download.link}
-                  onClick={(e) => download.disabled && e.preventDefault()}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={cn(
-                    "inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300",
-                    !download.disabled && "hover:scale-105 bg-gradient-to-r",
+                    "inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 bg-gradient-to-r",
                     download.color,
-                    "text-white shadow-lg hover:shadow-xl",
-                    download.disabled && "cursor-not-allowed"
+                    "text-white shadow-lg hover:shadow-xl"
                   )}
                 >
                   <Download className="w-5 h-5" />
@@ -207,12 +186,65 @@ export default function DownloadScreen() {
           ))}
         </div>
 
+        {/* macOS Gatekeeper Instructions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className={cn(
+            "p-6 rounded-3xl mb-12",
+            theme === 'light' ? "bg-yellow-50 border border-yellow-200" : "bg-yellow-900/20 border border-yellow-800"
+          )}
+        >
+          <div className="flex items-start gap-4">
+            <div className={cn(
+              "p-3 rounded-2xl flex-shrink-0",
+              theme === 'light' ? "bg-yellow-100" : "bg-yellow-800/30"
+            )}>
+              <Terminal className={cn("w-6 h-6", theme === 'light' ? "text-yellow-600" : "text-yellow-400")} />
+            </div>
+            <div className="flex-1">
+              <h3 className={cn(
+                "text-lg font-bold mb-2",
+                theme === 'light' ? "text-yellow-800" : "text-yellow-200"
+              )}>
+                macOS users: Quick fix for "damaged app" message
+              </h3>
+              <p className={cn(
+                "mb-4",
+                theme === 'light' ? "text-yellow-700" : "text-yellow-300"
+              )}>
+                Our app isn't signed with Apple yet (it costs $99/year!). Here's how to open it:
+              </p>
+              <ol className={cn(
+                "list-decimal list-inside space-y-2 mb-4",
+                theme === 'light' ? "text-yellow-700" : "text-yellow-300"
+              )}>
+                <li>Open <strong>Terminal</strong> (Applications &gt; Utilities)</li>
+                <li>Paste this command and press Enter:</li>
+              </ol>
+              <div className={cn(
+                "p-4 rounded-xl font-mono text-sm mb-4 select-all cursor-copy",
+                theme === 'light' ? "bg-white border border-yellow-200" : "bg-gray-900 border border-yellow-800"
+              )}>
+                xattr -cr /Applications/MindPlay.app
+              </div>
+              <p className={cn(
+                "text-sm",
+                theme === 'light' ? "text-yellow-600" : "text-yellow-400"
+              )}>
+                Now you can open MindPlay normally from Applications! 🎉
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Footer Note */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
-          className="mt-12 text-center"
+          className="text-center"
         >
           <p className={cn(
             "text-sm",
