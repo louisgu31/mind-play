@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAppStore } from '../store';
+import { useMetaStore } from '../metaStore';
 import { TARGET_WORDS, VALID_WORDS } from './wordle-words';
 
 function cn(...inputs: any[]) {
@@ -15,13 +16,39 @@ const WORD_LENGTH = 5;
 const MAX_ATTEMPTS = 6;
 
 type LetterState = 'correct' | 'present' | 'absent' | 'empty';
+type GuessResult = LetterState[];
+
+function evaluateGuess(guess: string, target: string): GuessResult {
+  const result: LetterState[] = new Array(WORD_LENGTH).fill('absent');
+  const targetLetters = target.split('');
+
+  for (let i = 0; i < WORD_LENGTH; i++) {
+    if (guess[i] === targetLetters[i]) {
+      result[i] = 'correct';
+      targetLetters[i] = '' as any;
+    }
+  }
+
+  for (let i = 0; i < WORD_LENGTH; i++) {
+    if (result[i] === 'correct') continue;
+    const letterIndex = targetLetters.indexOf(guess[i]);
+    if (letterIndex !== -1) {
+      result[i] = 'present';
+      targetLetters[letterIndex] = '' as any;
+    }
+  }
+
+  return result;
+}
 
 export default function WordleScreen() {
   const theme = useAppStore((state) => state.theme);
   const recordGame = useAppStore((state) => state.recordGame);
+  const { addCoins, addCreatureXpToAll, updateDailyQuest } = useMetaStore();
   const [targetWord, setTargetWord] = useState('');
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState<string[]>([]);
+  const [guessResults, setGuessResults] = useState<GuessResult[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
   const [showPlayAgain, setShowPlayAgain] = useState(false);
@@ -32,6 +59,7 @@ export default function WordleScreen() {
     setTargetWord(newWord);
     setCurrentGuess('');
     setGuesses([]);
+    setGuessResults([]);
     setGameOver(false);
     setWon(false);
     setShowPlayAgain(false);
@@ -42,14 +70,9 @@ export default function WordleScreen() {
     startNewGame();
   }, [startNewGame]);
 
-  const getLetterState = (letter: string, position: number, guessIndex: number): LetterState => {
-    if (guessIndex >= guesses.length) return 'empty';
-    const guess = guesses[guessIndex];
-    if (!guess[position]) return 'empty';
-
-    if (letter === targetWord[position]) return 'correct';
-    if (targetWord.includes(letter)) return 'present';
-    return 'absent';
+  const getLetterState = (position: number, guessIndex: number): LetterState => {
+    if (guessIndex >= guessResults.length) return 'empty';
+    return guessResults[guessIndex][position];
   };
 
   const handleKeyPress = (key: string) => {
@@ -64,17 +87,28 @@ export default function WordleScreen() {
         }
 
         const newGuesses = [...guesses, currentGuess];
+        const newResult = evaluateGuess(currentGuess, targetWord);
+        const newResults = [...guessResults, newResult];
         setGuesses(newGuesses);
+        setGuessResults(newResults);
         
         if (currentGuess === targetWord) {
           setWon(true);
           setGameOver(true);
           setShowPlayAgain(true);
           recordGame(true, 100 - (newGuesses.length * 10));
+          addCoins(50);
+          addCreatureXpToAll(10);
+          updateDailyQuest('playGames', 1);
+          updateDailyQuest('earnCoins', 50);
         } else if (newGuesses.length === MAX_ATTEMPTS) {
           setGameOver(true);
           setShowPlayAgain(true);
           recordGame(false, 10);
+          addCoins(20);
+          addCreatureXpToAll(5);
+          updateDailyQuest('playGames', 1);
+          updateDailyQuest('earnCoins', 20);
         }
         
         setCurrentGuess('');
@@ -100,7 +134,7 @@ export default function WordleScreen() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentGuess, guesses, gameOver, targetWord]);
+  }, [currentGuess, guesses, guessResults, gameOver, targetWord]);
 
   const keyboardRows = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -110,10 +144,12 @@ export default function WordleScreen() {
 
   const getKeyState = (key: string): LetterState => {
     let state: LetterState = 'empty';
-    for (const guess of guesses) {
+    for (let g = 0; g < guessResults.length; g++) {
+      const result = guessResults[g];
+      const guess = guesses[g];
       for (let i = 0; i < guess.length; i++) {
         if (guess[i] === key) {
-          const letterState = getLetterState(key, i, guesses.indexOf(guess));
+          const letterState = result[i];
           if (letterState === 'correct') return 'correct';
           if (letterState === 'present') state = 'present';
           else if (state === 'empty') state = 'absent';
@@ -144,7 +180,7 @@ export default function WordleScreen() {
               {Array.from({ length: WORD_LENGTH }).map((_, letterIndex) => {
                 const guess = guesses[attemptIndex];
                 const letter = guess ? guess[letterIndex] : (attemptIndex === guesses.length ? currentGuess[letterIndex] : '');
-                const state = guess ? getLetterState(letter, letterIndex, attemptIndex) : 'empty';
+                const state = guess ? getLetterState(letterIndex, attemptIndex) : 'empty';
                 const isFilled = !!letter;
 
                 return (
