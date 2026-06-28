@@ -45,6 +45,9 @@ function sendStatusToWindow(text, data = {}) {
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
+// Disable code signature verification for non-signed apps
+autoUpdater.verifyUpdateCodeSignatures = false;
+
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
 });
