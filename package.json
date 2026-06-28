@@ -61,7 +61,11 @@
       "electron/**/*"
     ],
     "mac": {
-      "category": "public.app-category.games"
+      "category": "public.app-category.games",
+      "identity": null,
+      "sign": false,
+      "gatekeeperAssess": false,
+      "hardenedRuntime": false
     },
     "win": {
       "target": "nsis"
