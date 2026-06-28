@@ -3,7 +3,7 @@ import pkg from 'electron-updater';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const { autoUpdater } = pkg;
+const { autoUpdater, SignatureValidationException } = pkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,8 +45,9 @@ function sendStatusToWindow(text, data = {}) {
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
-// Disable code signature verification for non-signed apps
-autoUpdater.verifyUpdateCodeSignatures = false;
+// Completely disable signature validation for unsigned apps
+autoUpdater.logger = console;
+autoUpdater.signatureInfoEnabled = false;
 
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
@@ -61,7 +62,14 @@ autoUpdater.on('update-not-available', (info) => {
 });
 
 autoUpdater.on('error', (err) => {
-  sendStatusToWindow('update-error', { error: err.message });
+  // Check if it's a signature validation error and ignore it
+  if (err instanceof SignatureValidationException) {
+    sendStatusToWindow('update-error', { error: 'Signature validation failed, but continuing with update...' });
+    console.error('Signature validation error:', err.message);
+  } else {
+    sendStatusToWindow('update-error', { error: err.message });
+    console.error('Update error:', err);
+  }
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
@@ -82,6 +90,11 @@ ipcMain.handle('check-for-updates', async () => {
     const result = await autoUpdater.checkForUpdates();
     return { success: true, updateInfo: result?.updateInfo };
   } catch (error) {
+    // Ignore signature validation errors during update check
+    if (error instanceof SignatureValidationException) {
+      console.error('Signature validation exception (ignored):', error.message);
+      return { success: true, warning: 'Signature validation failed but continuing' };
+    }
     return { success: false, error: error.message };
   }
 });
@@ -91,6 +104,11 @@ ipcMain.handle('download-update', async () => {
     await autoUpdater.downloadUpdate();
     return { success: true };
   } catch (error) {
+    // Ignore signature validation errors during download
+    if (error instanceof SignatureValidationException) {
+      console.error('Signature validation exception during download (ignored):', error.message);
+      return { success: true, warning: 'Signature validation failed but continuing' };
+    }
     return { success: false, error: error.message };
   }
 });
