@@ -62,10 +62,7 @@
     ],
     "mac": {
       "category": "public.app-category.games",
-      "identity": null,
-      "sign": false,
-      "gatekeeperAssess": false,
-      "hardenedRuntime": false
+      "identity": null
     },
     "win": {
       "target": "nsis"
