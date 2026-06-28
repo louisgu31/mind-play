@@ -438,14 +438,25 @@ export default function SettingsScreen() {
             theme === 'light' ? "bg-white shadow-sm" : "bg-gray-900 shadow-lg"
           )}
         >
-          <div className="flex items-center gap-3">
-            <Info className={cn("w-6 h-6", theme === 'light' ? "text-gray-400" : "text-gray-500")} />
-            <div>
-              <span className={cn("font-medium block", theme === 'light' ? "text-gray-900" : "text-white")}>
-                MindPlay
-              </span>
-              <span className={cn("text-xs", theme === 'light' ? "text-gray-500" : "text-gray-400")}>
-                {isDesktop ? `Version ${appVersion || '...'} (Desktop)` : 'Web Version'}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Info className={cn("w-6 h-6", theme === 'light' ? "text-gray-400" : "text-gray-500")} />
+              <div>
+                <span className={cn("font-medium block", theme === 'light' ? "text-gray-900" : "text-white")}>
+                  MindPlay
+                </span>
+                <span className={cn("text-xs", theme === 'light' ? "text-gray-500" : "text-gray-400")}>
+                  {isDesktop ? 'Desktop App' : 'Web Version'}
+                </span>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className={cn("text-xs font-medium px-2 py-1 rounded-full", 
+                isDesktop 
+                  ? (theme === 'light' ? "bg-blue-100 text-blue-700" : "bg-blue-900/40 text-blue-300")
+                  : (theme === 'light' ? "bg-green-100 text-green-700" : "bg-green-900/40 text-green-300")
+              )}>
+                v{appVersion || '1.0.0'}
               </span>
             </div>
           </div>

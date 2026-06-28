@@ -1,7 +1,9 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import pkg from 'electron-updater';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+const { autoUpdater } = pkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

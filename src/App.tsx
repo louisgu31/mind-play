@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -28,11 +28,12 @@ function Navigation() {
   const { t } = useTranslation();
   const location = useLocation();
   const theme = useAppStore((state) => state.theme);
+  const [isDesktop] = useState(() => typeof window !== 'undefined' && !!window.electronAPI);
 
   const navItems = [
     { path: '/', icon: Home, label: t('nav.home') },
     { path: '/games', icon: Gamepad2, label: t('nav.games') },
-    { path: '/download', icon: DownloadIcon, label: 'Download' },
+    ...(isDesktop ? [] : [{ path: '/download', icon: DownloadIcon, label: 'Download' }]),
     { path: '/stats', icon: Trophy, label: t('nav.stats') },
     { path: '/settings', icon: Settings, label: t('nav.settings') },
   ];
