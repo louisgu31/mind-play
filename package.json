@@ -1,6 +1,6 @@
 {
   "name": "mindplay",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "homepage": "https://louisgu31.github.io/mind-play/",
   "main": "electron/main.js",
@@ -23,6 +23,7 @@
     "@react-three/postprocessing": "^2.16.2",
     "@types/three": "^0.184.1",
     "clsx": "^2.1.1",
+    "electron-updater": "^6.8.9",
     "framer-motion": "^11.2.10",
     "i18next": "^23.11.5",
     "lucide-react": "^0.394.0",
@@ -67,6 +68,11 @@
     },
     "linux": {
       "target": "AppImage"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "louisgu31",
+      "repo": "mind-play"
     }
   }
 }
