@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAppStore } from '../store';
+import { useMetaStore } from '../metaStore';
 
 function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
@@ -106,6 +107,7 @@ function shuffleArray<T>(array: T[]): T[] {
 export default function ConnectionsScreen() {
   const theme = useAppStore((state) => state.theme);
   const recordGame = useAppStore((state) => state.recordGame);
+  const { addCoins, addFood, updateDailyQuest } = useMetaStore();
   
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle>(() => 
     SAMPLE_PUZZLES[Math.floor(Math.random() * SAMPLE_PUZZLES.length)]
@@ -167,6 +169,10 @@ export default function ConnectionsScreen() {
         setWon(true);
         setGameOver(true);
         recordGame(true, 100 - (mistakes * 15));
+        addCoins(40);
+        addFood(15);
+        updateDailyQuest('playGames', 1);
+        updateDailyQuest('earnCoins', 40);
       }
     } else {
       const correctCount = currentPuzzle.categories.reduce((count, cat) => {
@@ -188,6 +194,9 @@ export default function ConnectionsScreen() {
         if (newMistakes >= MAX_MISTAKES) {
           setGameOver(true);
           recordGame(false, 10);
+          addCoins(20);
+          updateDailyQuest('playGames', 1);
+          updateDailyQuest('earnCoins', 20);
         }
         return newMistakes;
       });

@@ -10,8 +10,6 @@ function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
 }
 
-declare const __APP_VERSION__: string;
-
 declare global {
   interface Window {
     electronAPI?: {
@@ -38,7 +36,7 @@ export default function SettingsScreen() {
   const stats = useAppStore((state) => state.stats);
   
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [appVersion, setAppVersion] = useState<string>(typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '');
+  const [appVersion, setAppVersion] = useState<string>('');
   const [updateStatus, setUpdateStatus] = useState<string>('idle');
   const [updateVersion, setUpdateVersion] = useState<string>('');
   const [downloadProgress, setDownloadProgress] = useState<number>(0);

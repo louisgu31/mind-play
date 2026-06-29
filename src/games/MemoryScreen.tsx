@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAppStore } from '../store';
+import { useMetaStore } from '../metaStore';
 
 function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
@@ -55,6 +56,7 @@ function formatTime(seconds: number): string {
 export default function MemoryScreen() {
   const theme = useAppStore((state) => state.theme);
   const recordGame = useAppStore((state) => state.recordGame);
+  const { addCoins, addCreatureXpToAll, updateDailyQuest } = useMetaStore();
   
   const [gameState, setGameState] = useState<GameState>('menu');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
@@ -161,8 +163,12 @@ export default function MemoryScreen() {
       hasRecordedRef.current = true;
       const xpReward = Math.max(20, 100 - (moves * 3) - (time * 2));
       recordGame(true, xpReward);
+      addCoins(30);
+      addCreatureXpToAll(20);
+      updateDailyQuest('playGames', 1);
+      updateDailyQuest('earnCoins', 30);
     }
-  }, [cards, moves, time, recordGame, difficulty]);
+  }, [cards, moves, time, recordGame, difficulty, addCoins, addCreatureXpToAll, updateDailyQuest]);
 
   if (gameState === 'menu') {
     return (

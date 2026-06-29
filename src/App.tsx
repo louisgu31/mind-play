@@ -17,7 +17,7 @@ import WordleScreen from './games/WordleScreen';
 import ConnectionsScreen from './games/ConnectionsScreen';
 import MemoryScreen from './games/MemoryScreen';
 import SudokuScreen from './games/SudokuScreen';
-import CrosswordScreen from './games/crossword-complete';
+import CrosswordScreen from './games/CrosswordScreen';
 import ChessScreen from './games/ChessScreen';
 
 function cn(...inputs: any[]) {

@@ -4,12 +4,15 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAppStore } from '../store';
 
+declare const __APP_VERSION__: string;
+
 function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
 }
 
 export default function DownloadScreen() {
   const theme = useAppStore((state) => state.theme);
+  const appVersion = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.1.0';
 
   const downloads = [
     {
@@ -18,7 +21,7 @@ export default function DownloadScreen() {
       description: 'For Mac with M1/M2/M3 chips',
       color: 'from-blue-500 to-indigo-600',
       size: '~120 MB',
-      link: 'https://github.com/louisgu31/mind-play/releases/download/v1.0.1/MindPlay-1.0.0-arm64.dmg',
+      link: `https://github.com/louisgu31/mind-play/releases/download/v${appVersion}/MindPlay-${appVersion}-arm64.dmg`,
       recommended: true
     },
     {
