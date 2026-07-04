@@ -453,9 +453,16 @@ export default function ChessScreen() {
   useEffect(() => {
     if (gameMode === 'pvc' && gameState.currentPlayer === 'black' && !gameEnded && !aiThinking) {
       setAiThinking(true);
-      aiTimeoutRef.current = setTimeout(() => {
+      
+      // Use requestIdleCallback or setTimeout to not block UI
+      const computeAI = () => {
         try {
-          const aiMove = getAIMove(gameState, gameState.aiDifficulty || 'easy');
+          const difficulty = gameState.aiDifficulty || 'easy';
+          console.log('AI computing move with difficulty:', difficulty);
+          
+          const aiMove = getAIMove(gameState, difficulty);
+          console.log('AI move found:', aiMove);
+          
           const newState = applyMove(gameState, aiMove);
           setGameState(newState);
           setAiThinking(false);
@@ -463,8 +470,24 @@ export default function ChessScreen() {
         } catch (error) {
           console.error('AI move error:', error);
           setAiThinking(false);
+          
+          // Fallback: try to get any legal move
+          try {
+            const moves = getLegalMoves(gameState, 0, 0);
+            if (moves.length > 0) {
+              const randomMove = moves[Math.floor(Math.random() * moves.length)];
+              const newState = applyMove(gameState, randomMove);
+              setGameState(newState);
+              checkGameEnd(newState);
+            }
+          } catch (e) {
+            console.error('Fallback also failed:', e);
+          }
         }
-      }, 1000);
+      };
+      
+      // Schedule AI computation with delay to not block UI
+      aiTimeoutRef.current = setTimeout(computeAI, 500);
     }
     return () => {
       if (aiTimeoutRef.current) {

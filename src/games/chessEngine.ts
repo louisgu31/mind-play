@@ -585,18 +585,9 @@ export const getGameStatus = (state: GameState): { status: 'playing' | 'checkmat
 };
 
 export function evaluateBoard(state: GameState): number {
+  // Fast evaluation - material + positional only (no expensive mobility calculation)
   let materialScore = 0;
   let positionalScore = 0;
-  let mobilityScore = 0;
-  let kingSafetyScore = 0;
-
-  let whiteMobility = 0;
-  let blackMobility = 0;
-  let whitePawns = 0;
-  let blackPawns = 0;
-
-  const whiteKingPos: [number, number] = [0, 0];
-  const blackKingPos: [number, number] = [0, 0];
 
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
@@ -611,81 +602,20 @@ export function evaluateBoard(state: GameState): number {
       if (piece.color === 'white') {
         materialScore += value;
         positionalScore += posValue;
-        if (piece.type === 'king') {
-          whiteKingPos[0] = r;
-          whiteKingPos[1] = c;
-        }
-        if (piece.type === 'pawn') whitePawns++;
-        whiteMobility += getPieceMobility(piece.type, r, c);
       } else {
         materialScore -= value;
         positionalScore -= posValue;
-        if (piece.type === 'king') {
-          blackKingPos[0] = r;
-          blackKingPos[1] = c;
-        }
-        if (piece.type === 'pawn') blackPawns++;
-        blackMobility += getPieceMobility(piece.type, r, c);
       }
     }
   }
 
-  mobilityScore = (whiteMobility - blackMobility) * 1;
-
-  const whiteKingSafety = calculateKingSafety(state, whiteKingPos, 'white', whitePawns);
-  const blackKingSafety = calculateKingSafety(state, blackKingPos, 'black', blackPawns);
-  kingSafetyScore = whiteKingSafety - blackKingSafety;
-
-  const total = materialScore + positionalScore + mobilityScore + kingSafetyScore;
+  const total = materialScore + positionalScore;
   return state.currentPlayer === 'white' ? total : -total;
 }
 
-function getPieceMobility(pieceType: PieceType, row: number, col: number): number {
-  const centerDist = Math.abs(3.5 - row) + Math.abs(3.5 - col);
-  const centerBonus = Math.max(0, 7 - centerDist);
 
-  switch (pieceType) {
-    case 'pawn': return 2 + centerBonus * 0.5;
-    case 'knight': return 6 + centerBonus;
-    case 'bishop': return 7 + centerBonus * 0.5;
-    case 'rook': return 10 + centerBonus * 0.3;
-    case 'queen': return 14 + centerBonus * 0.3;
-    case 'king': return 3;
-    default: return 0;
-  }
-}
 
-function calculateKingSafety(state: GameState, kingPos: [number, number], color: PieceColor, pawnCount: number): number {
-  let safety = 0;
-  const [kr, kc] = kingPos;
 
-  const pawnShieldPositions = color === 'white'
-    ? [[kr - 1, kc - 1], [kr - 1, kc], [kr - 1, kc + 1]]
-    : [[kr + 1, kc - 1], [kr + 1, kc], [kr + 1, kc + 1]];
-
-  for (const [r, c] of pawnShieldPositions) {
-    if (r >= 0 && r < 8 && c >= 0 && c < 8) {
-      const piece = state.board[r][c];
-      if (piece?.type === 'pawn' && piece.color === color) {
-        safety += 10;
-      }
-    }
-  }
-
-  const castledKingside = (color === 'white' && kc >= 5) || (color === 'black' && kc >= 5);
-  const castledQueenside = (color === 'white' && kc <= 2) || (color === 'black' && kc <= 2);
-  if (castledKingside || castledQueenside) {
-    safety += 15;
-  }
-
-  if (kc === 3 || kc === 4) {
-    safety -= 8;
-  }
-
-  safety += pawnCount * 2;
-
-  return safety;
-}
 
 function orderMoves(moves: Move[]): Move[] {
   return [...moves].sort((a, b) => {
@@ -852,9 +782,9 @@ function getHardMove(state: GameState, moves: Move[]): Move {
 
 function getUltimateMove(state: GameState, moves: Move[]): Move {
   const pieceCount = countPieces(state.board);
-  let depth = 3;
-  if (pieceCount <= 16) depth = 4;
-  if (pieceCount <= 8) depth = 5;
+  let depth = 3; // Reduced from 4 to 3 for faster computation
+  if (pieceCount <= 16) depth = 5;
+  if (pieceCount <= 8) depth = 6;
 
   let bestMove = moves[0];
   let bestScore = -Infinity;
@@ -876,8 +806,7 @@ function getUltimateMove(state: GameState, moves: Move[]): Move {
 function getImpossibleMove(state: GameState, moves: Move[]): Move {
   const pieceCount = countPieces(state.board);
   let depth = 4;
-  if (pieceCount <= 16) depth = 5;
-  if (pieceCount <= 8) depth = 6;
+  if (pieceCount <= 10) depth = 5;
 
   let bestMove = moves[0];
   let bestScore = -Infinity;
